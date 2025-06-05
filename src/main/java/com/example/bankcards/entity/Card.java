@@ -20,19 +20,19 @@ public class Card {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String cardNumber; // Будет храниться в зашифрованном виде
+    private String cardNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User owner;
 
     @Column(nullable = false)
-    private YearMonth expiryDate; // Год и месяц окончания срока действия
+    private YearMonth expiryDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CardStatus status;
 
-    @Column(nullable = false, precision = 19, scale = 2) // precision и scale для денег
+    @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
 } 

@@ -4,21 +4,21 @@ version: '3.8'
 
 services:
   postgres-db:
-    image: postgres:15 # Рекомендую использовать конкретную версию, например, 15 или 16
+    image: postgres:15
     container_name: bank_postgres_db
     environment:
-      POSTGRES_DB: bank_card_system_db # Имя базы данных, которое мы указали в application.yml
-      POSTGRES_USER: postgres # Имя пользователя, которое вы указали в application.yml
-      POSTGRES_PASSWORD: postgres # Пароль, который вы указали в application.yml
+      POSTGRES_DB: bank_card_system_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432" # Проброс порта с хоста в контейнер
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Сохранение данных между перезапусками контейнера
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - bank-network
 
 volumes:
-  postgres_data: # Именованный volume для персистентности данных БД
+  postgres_data:
 
 networks:
   bank-network:
