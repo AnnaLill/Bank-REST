@@ -1,0 +1,57 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-insert-admin-user
+      author: application-setup
+      logicalFilePath: db/changelog/changesets/002-insert-initial-users.xml
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: password
+                  value: $2a$12$IPkHvPF4D9b97RZyAW3JNuPZs4mqhbSkec2CXGemutkQmtyDMPQq.
+              - column:
+                  name: account_non_expired
+                  valueBoolean: true
+              - column:
+                  name: account_non_locked
+                  valueBoolean: true
+              - column:
+                  name: credentials_non_expired
+                  valueBoolean: true
+              - column:
+                  name: enabled
+                  valueBoolean: true
+        - sql:
+            sql: INSERT INTO user_roles (user_id, role_name) VALUES ((SELECT id from users where username = 'admin'), 'ADMIN');
+  - changeSet:
+      id: 002-insert-regular-user
+      author: application-setup
+      logicalFilePath: db/changelog/changesets/002-insert-initial-users.xml
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: user
+              - column:
+                  name: password
+                  value: $2a$12$iywJ32x/A5xpbqFPHr6MfORWZ0BizcCwjH6sFAa9NTkyHzTdiyKOW
+              - column:
+                  name: account_non_expired
+                  valueBoolean: true
+              - column:
+                  name: account_non_locked
+                  valueBoolean: true
+              - column:
+                  name: credentials_non_expired
+                  valueBoolean: true
+              - column:
+                  name: enabled
+                  valueBoolean: true
+        - sql:
+            sql: INSERT INTO user_roles (user_id, role_name) VALUES ((SELECT id from users where username = 'user'), 'USER'); 

@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: changesets/001-initial-schema.yml
+      relativeToChangelogFile: true
+  - include:
+      file: changesets/002-insert-initial-users.yml
+      relativeToChangelogFile: true 
