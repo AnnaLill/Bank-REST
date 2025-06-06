@@ -1,19 +1,24 @@
 package com.example.bankcards.security;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
-
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -40,30 +45,13 @@ public class JwtUtil {
         }
     }
 
-    public String generateJwtToken(Authentication authentication) {
-
-        UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
-
-        String roles = userPrincipal.getAuthorities().stream()
+    public String generateToken(UserDetails userPrincipal) {
+        List<String> roles = userPrincipal.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
+                .collect(Collectors.toList());
 
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
-                .claim(AUTHORITIES_KEY, roles)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(key, SignatureAlgorithm.HS512)
-                .compact();
-    }
-
-    public String generateTokenFromUsername(String username, java.util.Collection<? extends GrantedAuthority> authorities) {
-        String roles = authorities.stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
-        return Jwts.builder()
-                .setSubject(username)
                 .claim(AUTHORITIES_KEY, roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))

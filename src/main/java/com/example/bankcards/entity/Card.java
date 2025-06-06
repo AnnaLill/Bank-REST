@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import com.example.bankcards.util.CardNumberConverter;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
@@ -19,7 +20,8 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "card_number", nullable = false, unique = true)
+    @Convert(converter = CardNumberConverter.class)
     private String cardNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)

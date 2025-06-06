@@ -42,5 +42,7 @@ logging:
 app:
   jwt:
     secret: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-    expirationMs: 86400000 # 24 hours
+    expirationMs: 86400000
+  encryption:
+    secret: "~@I]^Z_9j3PUre38"
 
