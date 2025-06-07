@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface CardService {
 
+
     Page<CardDto> getAllCards(Pageable pageable);
 
     CardDto getCardById(Long id);
@@ -16,4 +17,9 @@ public interface CardService {
     CardDto updateCardStatus(Long id, String status);
 
     void deleteCard(Long id);
+
+
+    Page<CardDto> getCardsByUserId(Long userId, Pageable pageable);
+
+    CardDto requestCardBlock(Long cardId, Long userId);
 } 

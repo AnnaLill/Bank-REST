@@ -83,6 +83,29 @@ public class CardServiceImpl implements CardService {
         cardRepository.deleteById(id);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CardDto> getCardsByUserId(Long userId, Pageable pageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        return cardRepository.findByOwner(user, pageable).map(this::convertToDto);
+    }
+
+    @Override
+    @Transactional
+    public CardDto requestCardBlock(Long cardId, Long userId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + cardId));
+
+        if (!card.getOwner().getId().equals(userId)) {
+            throw new SecurityException("User " + userId + " does not have permission to block card " + cardId);
+        }
+
+        card.setStatus(CardStatus.BLOCKED);
+        Card updatedCard = cardRepository.save(card);
+        return convertToDto(updatedCard);
+    }
+
     private CardDto convertToDto(Card card) {
         CardDto dto = new CardDto();
         dto.setId(card.getId());
