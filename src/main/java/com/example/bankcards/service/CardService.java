@@ -2,7 +2,6 @@ package com.example.bankcards.service;
 
 import com.example.bankcards.dto.CardCreateRequestDto;
 import com.example.bankcards.dto.CardDto;
-import com.example.bankcards.dto.TransferRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,6 +22,4 @@ public interface CardService {
     Page<CardDto> getCardsByUserId(Long userId, Pageable pageable);
 
     CardDto requestCardBlock(Long cardId, Long userId);
-
-    void transferFunds(Long userId, TransferRequestDto requestDto);
 } 

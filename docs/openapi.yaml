@@ -1,1 +1,632 @@
-# Здесь будет OpenAPI описание всех доступных эндпоинтов и моделей данных.
+openapi: 3.0.1
+info:
+  title: Bank Card System API
+  version: v1.0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+security:
+- bearerAuth: []
+tags:
+- name: User Card Controller
+  description: Endpoints for a user to manage their own cards
+- name: Authentication Controller
+  description: Controller for user authentication and token generation
+- name: Admin Card Controller
+  description: Endpoints for managing any user's cards (Admin access required)
+paths:
+  /api/v1/user/cards/transfers:
+    post:
+      tags:
+      - User Card Controller
+      summary: Transfer funds between my cards
+      description: Allows the authenticated user to transfer funds between two of
+        their own cards.
+      operationId: transferFunds
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequestDto'
+        required: true
+      responses:
+        "403":
+          description: Forbidden - User does not own one or both cards
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "400":
+          description: "Invalid transfer request (e.g., insufficient funds, same card,\
+            \ validation error)"
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "404":
+          description: One or both cards not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "200":
+          description: Transfer successful
+      security:
+      - bearerAuth: []
+  /api/v1/admin/cards:
+    get:
+      tags:
+      - Admin Card Controller
+      summary: Get all cards
+      description: Retrieves a paginated list of all cards in the system.
+      operationId: getAllCards
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        "403":
+          description: Forbidden - Admin access required
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "200":
+          description: Successfully retrieved list of cards
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageCardDto'
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Admin Card Controller
+      summary: Create a new card
+      description: Creates a new bank card for a specified user.
+      operationId: createCard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardCreateRequestDto'
+        required: true
+      responses:
+        "403":
+          description: Forbidden - Admin access required
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "400":
+          description: Invalid card data provided (validation error)
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "404":
+          description: User not found for the given userId
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "201":
+          description: Card created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CardDto'
+      security:
+      - bearerAuth: []
+  /api/auth/login:
+    post:
+      tags:
+      - Authentication Controller
+      summary: User Login
+      description: Authenticates a user and returns a JWT token.
+      operationId: createAuthenticationToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JwtRequestDto'
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "200":
+          description: Successfully authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtResponseDto'
+        "401":
+          description: Unauthorized - authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /api/v1/user/cards/{id}/block:
+    patch:
+      tags:
+      - User Card Controller
+      summary: Block my card
+      description: Allows the authenticated user to block one of their own cards.
+      operationId: blockMyCard
+      parameters:
+      - name: id
+        in: path
+        description: ID of the card to be blocked
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "403":
+          description: Forbidden - User does not own this card
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "404":
+          description: Card not found with the given ID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "200":
+          description: Card successfully blocked
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CardDto'
+      security:
+      - bearerAuth: []
+  /api/v1/admin/cards/{id}/status:
+    patch:
+      tags:
+      - Admin Card Controller
+      summary: Update card status
+      description: "Updates the status of an existing card (e.g., ACTIVE, BLOCKED)."
+      operationId: updateCardStatus
+      parameters:
+      - name: id
+        in: path
+        description: ID of the card to update
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: status
+        in: query
+        description: "The new status for the card (e.g., ACTIVE, BLOCKED, EXPIRED)"
+        required: true
+        schema:
+          type: string
+      responses:
+        "403":
+          description: Forbidden - Admin access required
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "400":
+          description: Invalid status value provided
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "404":
+          description: Card not found with the given ID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "200":
+          description: Card status updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CardDto'
+      security:
+      - bearerAuth: []
+  /api/v1/user/cards:
+    get:
+      tags:
+      - User Card Controller
+      summary: Get my cards
+      description: Retrieves a paginated list of cards owned by the currently authenticated
+        user.
+      operationId: getMyCards
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        "403":
+          description: Forbidden - User access required
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "200":
+          description: Successfully retrieved the list of cards
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageCardDto'
+      security:
+      - bearerAuth: []
+  /api/v1/admin/cards/{id}:
+    get:
+      tags:
+      - Admin Card Controller
+      summary: Get card by ID
+      description: Retrieves a single card by its unique ID.
+      operationId: getCardById
+      parameters:
+      - name: id
+        in: path
+        description: ID of the card to be retrieved
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "403":
+          description: Forbidden - Admin access required
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "404":
+          description: Card not found with the given ID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "200":
+          description: Successfully retrieved the card
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CardDto'
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Admin Card Controller
+      summary: Delete a card
+      description: Deletes a card from the system by its ID.
+      operationId: deleteCard
+      parameters:
+      - name: id
+        in: path
+        description: ID of the card to be deleted
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "403":
+          description: Forbidden - Admin access required
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "404":
+          description: Card not found with the given ID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        "204":
+          description: Card deleted successfully
+      security:
+      - bearerAuth: []
+components:
+  schemas:
+    ErrorResponseDto:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+    TransferRequestDto:
+      required:
+      - amount
+      - fromCardId
+      - toCardId
+      type: object
+      properties:
+        fromCardId:
+          type: integer
+          format: int64
+        toCardId:
+          type: integer
+          format: int64
+        amount:
+          type: number
+    CardCreateRequestDto:
+      required:
+      - balance
+      - cardNumber
+      - expiryDate
+      - userId
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        cardNumber:
+          pattern: "^[0-9]{13,19}$"
+          type: string
+        expiryDate:
+          type: object
+          properties:
+            year:
+              type: integer
+              format: int32
+            month:
+              type: string
+              enum:
+              - JANUARY
+              - FEBRUARY
+              - MARCH
+              - APRIL
+              - MAY
+              - JUNE
+              - JULY
+              - AUGUST
+              - SEPTEMBER
+              - OCTOBER
+              - NOVEMBER
+              - DECEMBER
+            monthValue:
+              type: integer
+              format: int32
+            leapYear:
+              type: boolean
+        balance:
+          type: number
+    CardDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        maskedCardNumber:
+          type: string
+        ownerUsername:
+          type: string
+        expiryDate:
+          type: string
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - BLOCKED
+          - EXPIRED
+        balance:
+          type: number
+    JwtRequestDto:
+      required:
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    JwtResponseDto:
+      type: object
+      properties:
+        token:
+          type: string
+        type:
+          type: string
+    Pageable:
+      type: object
+      properties:
+        page:
+          minimum: 0
+          type: integer
+          format: int32
+        size:
+          minimum: 1
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            type: string
+    PageCardDto:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardDto'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        unpaged:
+          type: boolean
+        paged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
