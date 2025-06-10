@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -74,8 +77,13 @@ class UserCardControllerTest {
                 new CardDto(101L, "**** **** **** 1111", new BigDecimal("100.00"), CardStatus.ACTIVE),
                 new CardDto(102L, "**** **** **** 2222", new BigDecimal("200.00"), CardStatus.BLOCKED)
         );
+        int page = 0;
+        int size = 10;
+        long totalElements = cards.size();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CardDto> cardPage = new PageImpl<>(cards, pageable, totalElements);
         given(cardService.getCardsByUserId(eq(userId), any(Pageable.class)))
-                .willReturn(new RestPageImpl<>(cards));
+                .willReturn(cardPage);
 
         mockMvc.perform(get("/api/v1/user/cards")
                         .with(user(mockUserDetails))
