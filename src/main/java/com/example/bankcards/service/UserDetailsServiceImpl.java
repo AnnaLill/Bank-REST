@@ -15,18 +15,39 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 
+/**
+ * Реализация сервиса для работы с пользователями Spring Security.
+ * Предоставляет функциональность для загрузки пользователей по имени
+ * и регистрации новых пользователей в системе.
+ * 
+ * @author Анна Тебенькова
+ * @version 1.0
+ */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Конструктор сервиса.
+     * 
+     * @param userRepository репозиторий для работы с пользователями
+     * @param passwordEncoder кодировщик паролей
+     */
     @Autowired
     public UserDetailsServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Загружает пользователя по имени пользователя для Spring Security.
+     * 
+     * @param username имя пользователя
+     * @return детали пользователя для Spring Security
+     * @throws UsernameNotFoundException если пользователь не найден
+     */
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -36,6 +57,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return new SecurityUserDetails(user);
     }
 
+    /**
+     * Регистрирует нового пользователя в системе.
+     * Создает учетную запись с ролью USER по умолчанию.
+     * 
+     * @param registrationDto данные для регистрации пользователя
+     * @return сообщение об успешной регистрации
+     * @throws IllegalStateException если пользователь с таким именем уже существует
+     */
     @Transactional
     public String registerNewUser(UserRegistrationDto registrationDto) {
         if (userRepository.findByUsername(registrationDto.getUsername()).isPresent()) {

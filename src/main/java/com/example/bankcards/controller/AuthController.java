@@ -25,6 +25,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Контроллер для аутентификации и регистрации пользователей.
+ * Предоставляет эндпоинты для входа в систему и регистрации новых пользователей.
+ * Все эндпоинты доступны без аутентификации.
+ * 
+ * @author Анна Тебенькова
+ * @version 1.0
+ */
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -35,6 +43,14 @@ public class AuthController {
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtUtil jwtUtil;
 
+    /**
+     * Аутентифицирует пользователя и возвращает JWT токен.
+     * Проверяет учетные данные пользователя и генерирует токен для доступа к защищенным ресурсам.
+     * 
+     * @param authenticationRequest данные для аутентификации (имя пользователя и пароль)
+     * @return JWT токен в случае успешной аутентификации
+     * @throws BadCredentialsException если учетные данные неверны
+     */
     @Operation(summary = "User Login", description = "Authenticates a user and returns a JWT token.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully authenticated",
@@ -61,6 +77,13 @@ public class AuthController {
         return ResponseEntity.ok(new JwtResponseDto(jwt));
     }
 
+    /**
+     * Регистрирует нового пользователя в системе.
+     * Создает новую учетную запись с ролью USER по умолчанию.
+     * 
+     * @param registrationDto данные для регистрации пользователя
+     * @return сообщение об успешной регистрации
+     */
     @Operation(summary = "User Registration", description = "Registers a new user in the system.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User registered successfully",

@@ -30,6 +30,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Контроллер для административного управления банковскими картами.
+ * Предоставляет полный набор CRUD-операций для управления картами всех пользователей.
+ * Доступен только пользователям с ролью ADMIN.
+ * 
+ * @author Анна Тебенькова
+ * @version 1.0
+ */
 @RestController
 @RequestMapping("/api/v1/admin/cards")
 @RequiredArgsConstructor
@@ -40,6 +48,12 @@ public class AdminCardController {
 
     private final CardService cardService;
 
+    /**
+     * Получает постраничный список всех карт в системе.
+     * 
+     * @param pageable параметры пагинации (размер страницы, номер страницы, сортировка)
+     * @return страница с картами всех пользователей
+     */
     @Operation(summary = "Get all cards", description = "Retrieves a paginated list of all cards in the system.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of cards"),
@@ -51,6 +65,12 @@ public class AdminCardController {
         return ResponseEntity.ok(cardService.getAllCards(pageable));
     }
 
+    /**
+     * Получает карту по её уникальному идентификатору.
+     * 
+     * @param id идентификатор карты
+     * @return данные карты
+     */
     @Operation(summary = "Get card by ID", description = "Retrieves a single card by its unique ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved the card"),
@@ -64,6 +84,12 @@ public class AdminCardController {
         return ResponseEntity.ok(cardService.getCardById(id));
     }
 
+    /**
+     * Создает новую банковскую карту для указанного пользователя.
+     * 
+     * @param requestDto данные для создания карты (пользователь, номер, срок действия, баланс)
+     * @return созданная карта с HTTP статусом 201
+     */
     @Operation(summary = "Create a new card", description = "Creates a new bank card for a specified user.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Card created successfully"),
@@ -80,6 +106,13 @@ public class AdminCardController {
         return new ResponseEntity<>(createdCard, HttpStatus.CREATED);
     }
 
+    /**
+     * Обновляет статус существующей карты.
+     * 
+     * @param id идентификатор карты
+     * @param status новый статус (ACTIVE, BLOCKED, EXPIRED)
+     * @return обновленная карта
+     */
     @Operation(summary = "Update card status", description = "Updates the status of an existing card (e.g., ACTIVE, BLOCKED).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Card status updated successfully"),
@@ -97,6 +130,11 @@ public class AdminCardController {
         return ResponseEntity.ok(updatedCard);
     }
 
+    /**
+     * Удаляет карту из системы по её идентификатору.
+     * 
+     * @param id идентификатор карты для удаления
+     */
     @Operation(summary = "Delete a card", description = "Deletes a card from the system by its ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Card deleted successfully"),
